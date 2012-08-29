@@ -16,6 +16,7 @@ import flickrapi
 
 log = logging.getLogger('migrate')
 log.setLevel(logging.INFO)
+log.setLevel(logging.DEBUG)
 
 config = ConfigParser.ConfigParser()
 try:

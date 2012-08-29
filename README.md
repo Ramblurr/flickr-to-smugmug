@@ -34,7 +34,6 @@ Or, fetch the dependencies from their respective sites.
 
 * [smugpy](https://github.com/chrishoffman/smugpy) - Smugmug Python library
 * [flickrapi](http://stuvel.eu/flickrapi) - Flickr Python library
-* [pyyaml](http://pyyaml.org/) - YAML implementation for Python
 
 ## Usage
 
