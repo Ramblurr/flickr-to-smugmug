@@ -2,6 +2,7 @@ import ConfigParser
 import sys
 import os
 import logging
+import codecs
 from xml.etree.ElementTree import dump
 
 # third-party modules
@@ -122,7 +123,7 @@ class flickr:
                                     'tags': tags,
                                     'url': source_url }
                 set_metadata['contents'].append(photo_metadata)
-            with open(meta_f, 'wb') as set_file:
+            with codecs.open(meta_f, 'wb', encoding="utf-8") as set_file:
                 set_file.write(yaml.dump(set_metadata))
 
 class smugmug:
@@ -159,7 +160,7 @@ class smugmug:
         if resp['stat'] == 'ok':
             log.info('smugmug: created album %s' %(title))
         else:
-            log.error('smugmug: FAILED creat album album %s' %(title))
+            log.error('smugmug: FAILED create album album %s' %(title))
 
         return resp['Album']
 
@@ -172,9 +173,10 @@ class smugmug:
         log.info("smugmug: %s sets ready for import" %(len(sets)))
         current = 0
         for f in sets:
-            metadata = yaml.load(file("%s%s%s" % (input_dir,os.sep,f), 'r'))
+            metadata = yaml.load(codecs.open("%s%s%s" % (input_dir,os.sep,f), 'r',  encoding="utf-8"))
             current += 1
             log.info("smugmug: Processing set %s/%s: %s" % (current, len(sets), metadata['title']))
+            log.debug("smugmug: file %s" % (f))
 
             album = self.album_find(metadata['title'])
             if album is None:
@@ -207,9 +209,9 @@ class smugmug:
                 photo['smugmugged'] = resp['stat'] == 'ok'
                 metadata['contents'][index] = photo
 
-            # persist progress
-            with open("%s%s%s" % (input_dir,os.sep,f), 'wb') as set_file:
-                set_file.write(yaml.dump(metadata))
+                # persist progress
+                with codecs.open("%s%s%s" % (input_dir,os.sep,f), 'wb', encoding="utf-8") as set_file:
+                    set_file.write(yaml.dump(metadata))
 
 
 log.info("Authenticating flickr")
