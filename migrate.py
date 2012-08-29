@@ -201,8 +201,17 @@ class smugmug:
 
                 log.info('smugmug: Uploading photo %s/%s' %( current_photo, len(metadata['contents'])))
 
-                tags = ",".join(photo['tags'])
-                caption = "%s\n%s" %(photo['title'], photo['description'])
+                if len(photo['tags']) > 0:
+                    tags = ",".join(photo['tags'])
+                else:
+                    tags = ''
+                desc = photo['description']
+                if desc is None or desc == "None":
+                    desc = ''
+                caption = "%s\n%s" %(photo['title'], desc)
+                log.debug("smugmug: payload caption '%s'" %(caption))
+                log.debug("smugmug: payload tags '%s'" %(tags))
+                log.debug("smugmug: payload url '%s'" %(photo['url']))
                 resp = self.client.images_uploadFromURL(AlbumID=album['id'], URL=photo['url'], Caption=caption, Keywords=tags)
                 log.debug("smugmug: uploaded %s" %(resp))
 
