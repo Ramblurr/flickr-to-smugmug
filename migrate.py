@@ -97,7 +97,7 @@ class flickr:
                               'primary': set.attrib['primary'],
                               'contents': [] }
             meta_f = '%s/%s.yml' % (output_dir, set_metadata['id'])
-            if os.path.exists(meta_f) or not overwrite:
+            if os.path.exists(meta_f) and not overwrite:
                 log.info("flickr: skipping set '%s'" % (set_metadata['title']))
                 continue
             log.info("flickr: saving set '%s'" % (set_metadata['title']))
