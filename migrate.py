@@ -1,9 +1,11 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 import ConfigParser
 import sys
 import os
 import logging
-import codecs
 from xml.etree.ElementTree import dump
+import pickle
 
 # third-party modules
 import yaml
@@ -96,7 +98,7 @@ class flickr:
                               'videos_count': set.attrib['videos'],
                               'primary': set.attrib['primary'],
                               'contents': [] }
-            meta_f = '%s/%s.yml' % (output_dir, set_metadata['id'])
+            meta_f = '%s/%s.pkl' % (output_dir, set_metadata['id'])
             if os.path.exists(meta_f) and not overwrite:
                 log.info("flickr: skipping set '%s'" % (set_metadata['title']))
                 continue
@@ -123,8 +125,8 @@ class flickr:
                                     'tags': tags,
                                     'url': source_url }
                 set_metadata['contents'].append(photo_metadata)
-            with codecs.open(meta_f, 'wb', encoding="utf-8") as set_file:
-                set_file.write(yaml.dump(set_metadata))
+            with open(meta_f, 'wb') as set_file:
+                pickle.dump(set_metadata, set_file)
 
 class smugmug:
     def __init__(self):
@@ -169,11 +171,11 @@ class smugmug:
             log.error("smugmug: can't import from %s" %(input_dir))
             return False
 
-        sets = filter(lambda f: f.endswith('yml'), os.listdir(input_dir))
+        sets = filter(lambda f: f.endswith('pkl'), os.listdir(input_dir))
         log.info("smugmug: %s sets ready for import" %(len(sets)))
         current = 0
         for f in sets:
-            metadata = yaml.load(codecs.open("%s%s%s" % (input_dir,os.sep,f), 'r',  encoding="utf-8"))
+            metadata = pickle.load(open("%s%s%s" % (input_dir,os.sep,f), 'rb'))
             current += 1
             log.info("smugmug: Processing set %s/%s: %s" % (current, len(sets), metadata['title']))
             log.debug("smugmug: file %s" % (f))
@@ -212,15 +214,17 @@ class smugmug:
                 log.debug("smugmug: payload caption '%s'" %(caption))
                 log.debug("smugmug: payload tags '%s'" %(tags))
                 log.debug("smugmug: payload url '%s'" %(photo['url']))
-                resp = self.client.images_uploadFromURL(AlbumID=album['id'], URL=photo['url'], Caption=caption, Keywords=tags)
+                resp = self.client.images_uploadFromURL(AlbumID=album['id'], URL=photo['url'],
+                                                        Caption=unicode(caption).encode('utf-8'),
+                                                        Keywords=unicode(tags).encode('utf-8'))
                 log.debug("smugmug: uploaded %s" %(resp))
 
                 photo['smugmugged'] = resp['stat'] == 'ok'
                 metadata['contents'][index] = photo
 
                 # persist progress
-                with codecs.open("%s%s%s" % (input_dir,os.sep,f), 'wb', encoding="utf-8") as set_file:
-                    set_file.write(yaml.dump(metadata))
+                with open("%s%s%s" % (input_dir,os.sep,f), 'wb') as set_file:
+                    pickle.dump(metadata, set_file)
 
 
 log.info("Authenticating flickr")
