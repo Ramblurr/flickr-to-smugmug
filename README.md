@@ -17,12 +17,14 @@ Notably the following **are NOT** migrated:
 * Flickr collections
 * Everything else not listed above
 
-\* no de-duplication is performed if images exist in multiple Flickr photosets
+\* no de-duplication is performed if images exist in multiple Flickr photosetso
+
+Licensed under the GPL v3 (see LICENSE)
 
 ## Requirements
 
 * Smugmug account w/ API key
-* Flickr account w/ API key (**PRO* account is necessary** to fetch *original* images)
+* Flickr account w/ API key (**PRO account is necessary** to fetch *original* images)
 
 **Python Modules:**
 
