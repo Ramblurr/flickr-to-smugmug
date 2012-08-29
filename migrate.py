@@ -16,7 +16,6 @@ import flickrapi
 
 log = logging.getLogger('migrate')
 log.setLevel(logging.INFO)
-log.setLevel(logging.DEBUG)
 
 config = ConfigParser.ConfigParser()
 try:
@@ -158,7 +157,7 @@ class smugmug:
         return None
 
     def album_create(self, title, desc):
-        resp = self.client.albums_create(Title=title, Description=desc, Public=False, Extras='Description')
+        resp = self.client.albums_create(Title=unicode(title).encode('utf-8'), Description=unicode(desc).encode('utf-8'), Public=False, Extras='Description')
         log.debug("smugmug: album_create %s" %(resp))
         if resp['stat'] == 'ok':
             log.info('smugmug: created album %s' %(title))
