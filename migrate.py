@@ -208,7 +208,7 @@ class smugmug:
                 current_photo += 1
 
                 try:
-                    if photo['smugmugged']:
+                    if photo['smugmugged'] and not forced:
                         log.info('smugmug: Skipping photo %s/%s' %( current_photo, len(metadata['contents'])))
                         continue
                 except KeyError:
@@ -256,6 +256,7 @@ log.info("Fetching flickr metadata")
 f.dump_sets("./tmp")
 log.info("Flickr fetch complete")
 log.info("Importing photos to Smugmug")
-s.import_albums("tmp")
+forced = False # TODO: make argument
+s.import_albums("tmp", forced)
 
 
