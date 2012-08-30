@@ -187,17 +187,19 @@ class smugmug:
             log.info("smugmug: Processing set %s/%s: %s" % (current, len(sets), metadata['title']))
             log.debug("smugmug: file %s" % (f))
 
+            album = None
             if not metadata.get('smug_id', None) is None:
                 album = self.album_get(metadata['smug_id'])
                 log.info('smugmug: using cached album %s id:' %(metadata['title'], metadata['smug_id']))
             else:
                 album = self.album_find(metadata['title'])
-                log.info('smugmug: using existing album %s' %(metadata['title']))
+                if not album is None:
+                    log.info('smugmug: using existing album %s' %(metadata['title']))
             if album is None:
                 album = self.album_create(metadata['title'], metadata['description'])
                 metadata['smug_id'] = album['id']
             if album['Description'] != metadata['description']:
-                resp = self.client.albums_changeSettings(AlbumID=album['id'], Description=metadata['description'])
+                resp = self.client.albums_changeSettings(AlbumID=album['id'], Description=unicode(metadata['description']).encode('utf-8'))
                 if resp['stat'] == 'ok':
                     log.info('smugmug: changed description for album %s' %(metadata['title']))
                 else:
