@@ -156,6 +156,13 @@ class smugmug:
                 return a
         return None
 
+    def album_get(self, id):
+        albums = self.list_albums()
+        for a in albums:
+            if a['id'] == id:
+                return a
+        return None
+
     def album_create(self, title, desc):
         resp = self.client.albums_create(Title=unicode(title).encode('utf-8'), Description=unicode(desc).encode('utf-8'), Public=False, Extras='Description')
         log.debug("smugmug: album_create %s" %(resp))
@@ -166,7 +173,7 @@ class smugmug:
 
         return resp['Album']
 
-    def import_albums(self, input_dir):
+    def import_albums(self, input_dir, force=False):
         if not os.path.exists(input_dir):
             log.error("smugmug: can't import from %s" %(input_dir))
             return False
@@ -180,9 +187,15 @@ class smugmug:
             log.info("smugmug: Processing set %s/%s: %s" % (current, len(sets), metadata['title']))
             log.debug("smugmug: file %s" % (f))
 
-            album = self.album_find(metadata['title'])
+            if not metadata.get('smug_id', None) is None:
+                album = self.album_get(metadata['smug_id'])
+                log.info('smugmug: using cached album %s id:' %(metadata['title'], metadata['smug_id']))
+            else:
+                album = self.album_find(metadata['title'])
+                log.info('smugmug: using existing album %s' %(metadata['title']))
             if album is None:
                 album = self.album_create(metadata['title'], metadata['description'])
+                metadata['smug_id'] = album['id']
             if album['Description'] != metadata['description']:
                 resp = self.client.albums_changeSettings(AlbumID=album['id'], Description=metadata['description'])
                 if resp['stat'] == 'ok':
